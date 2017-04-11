@@ -10,7 +10,7 @@ app.use(express.static('src'))
   .set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
-  res.render('home');
+  res.render('index');
 });
 
 app.listen(port, host, function () {
