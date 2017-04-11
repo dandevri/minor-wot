@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/dandevri/minor-wot/issues"
   },
-  "homepage": "https://github.com/dandevri/minor-wot#readme"
+  "homepage": "https://github.com/dandevri/minor-wot#readme",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
 }
