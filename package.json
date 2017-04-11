@@ -1,0 +1,20 @@
+{
+  "name": "minor-wot",
+  "version": "1.0.0",
+  "description": "Code &amp; documentation for the Minor Class: Web Of Things 📡",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dandevri/minor-wot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dandevri/minor-wot/issues"
+  },
+  "homepage": "https://github.com/dandevri/minor-wot#readme"
+}
