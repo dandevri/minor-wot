@@ -8,6 +8,10 @@ var app = express();
 app.use(express.static('src'))
   .set('views', 'views');
 
+app.get('/', function (req, res) {
+  res.render('home');
+});
+
 app.listen(port, host, function () {
   console.log('Server running', host, ':', port);
 });
