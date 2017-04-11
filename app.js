@@ -6,7 +6,8 @@ var host = process.env.HOST || '0.0.0.0';
 var app = express();
 
 app.use(express.static('src'))
-  .set('views', 'views');
+  .set('views', 'views')
+  .set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
   res.render('home');
