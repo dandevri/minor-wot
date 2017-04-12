@@ -21,12 +21,22 @@ app.get('/', function (req, res) {
 });
 
 app.get('/api/scored/:team', function (req, res) {
-  if(req.params.team === 'team1') {
-    scores.team1 = scores.team1 + 1;
+  if (req.params.team === 'team1') {
+    scores.team1 += 1;
   } else {
-    scores.team2 = scores.team2 + 1;
+    scores.team2 += 1;
   }
-console.log(scores);
+
+  if (scores.team1 === 10) {
+    scores.matchpoints1 += 1;
+    scores.team1 = 0;
+    scores.team2 = 0;
+  } else if (scores.team2 === 10) {
+    scores.matchpoints2 += 1;
+    scores.team1 = 0;
+    scores.team2 = 0;
+  }
+
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(scores));
 });
