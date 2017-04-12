@@ -17,7 +17,7 @@ app.use(express.static('src'))
   .set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
-  res.render('home');
+  res.render('index', scores);
 });
 
 app.get('/api/scored/:team', function (req, res) {
