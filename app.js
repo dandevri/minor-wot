@@ -67,7 +67,7 @@ function removeSettings(id) {
     function () {
       fetch('http://oege.ie.hva.nl/~palr001/icu/api.php?t=rdc&d=XXXX&td=' + id);
     },
-    3000
+    4000
   );
 }
 
