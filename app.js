@@ -1,5 +1,6 @@
 var express = require('express');
 var includes = require('lodash/includes');
+var fetch = require('node-fetch');
 
 var port = process.env.PORT || '3000';
 var host = process.env.HOST || '0.0.0.0';
@@ -43,6 +44,15 @@ function buttonFeedback(type, id) {
       break;
     case 'vote':
       console.log('send ' + id + ' vote color');
+      fetch('http://oege.ie.hva.nl/~palr001/icu/api.php?t=sdc&d=XXXX&td=' + id + '&c=ff0000')
+        .then(fetch('http://oege.ie.hva.nl/~palr001/icu/api.php?t=sqi&d=XXXX')
+          .catch(function (err) {
+            console.log(err);
+          }))
+        .then(removeSettings(id))
+        .catch(function (err) {
+          console.log(err);
+        });
       break;
     case 'skipp':
       console.log('send ' + id + ' skipp color');
@@ -50,6 +60,15 @@ function buttonFeedback(type, id) {
     default:
       break;
   }
+}
+
+function removeSettings(id) {
+  setTimeout(
+    function () {
+      fetch('http://oege.ie.hva.nl/~palr001/icu/api.php?t=rdc&d=XXXX&td=' + id);
+    },
+    3000
+  );
 }
 
 function clearVotes() {
