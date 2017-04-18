@@ -18,13 +18,23 @@ app.get('/', function (req, res) {
 
 app.get('/api/vote', function (req, res) {
   console.log('vote from', req.query.chip);
-  storeVote(req.query.chip);
+  vote(req.query.chip);
   res.send('vote received for ' + req.query.chip);
 });
 
-function storeVote(id) {
+function vote(id) {
   votes.push(id);
   votes = uniq(votes);
+
+  if (votes.length >= 3) {
+    console.log('sufficient votes, skipp current song');
+    clearVotes();
+  }
+}
+
+function clearVotes() {
+  votes = [];
+  return votes;
 }
 
 app.listen(port, host, function () {
