@@ -1,0 +1,63 @@
+/* ==========================================================================
+   Reset
+   ========================================================================== */
+button {
+  background: none;
+  border: 0;
+  color: white;
+}
+
+dd {
+  padding: 0;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+
+body {
+  background-image: linear-gradient(60deg, #29323c 0%, #485563 100%);
+  color: white;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+}
+
+main {
+  background-color: #222222;
+  padding: 2em;
+  min-width: 40vw;
+  box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+}
+
+.controls {
+  display: flex;
+  justify-content: space-around;
+}
+
+button {
+  font-size: 2em;
+  border: 1px solid #fff;
+  border-radius: .25em;
+  transition: all 250ms;
+}
+
+button:hover, button:focus {
+  background-color: #fff;
+  color: #2ebd59;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+dl {
+  line-height: 2;
+}
+
+dt {
+  font-weight: 700;
+}
