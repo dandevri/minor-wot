@@ -1,20 +1,134 @@
-var express = require('express');
-var includes = require('lodash/includes');
-var fetch = require('node-fetch');
+var Spotify       = require('spotify-web-api-node');
+var express       = require('express');
+var querystring   = require('querystring');
+var cookieParser  = require('cookie-parser');
+var request       = require('request');
+var dotenv        = require('dotenv').config();
+var includes      = require('lodash/includes');
+var fetch         = require('node-fetch');
 
-var port = process.env.PORT || '3000';
-var host = process.env.HOST || '0.0.0.0';
+var port          = process.env.PORT || '3000';
+var host          = process.env.HOST || '0.0.0.0';
 
-var app = express();
+var CLIENT_ID     = process.env.CLIENT_ID;
+var CLIENT_SECRET = process.env.CLIENT_SECRET;
+var REDIRECT_URI  = process.env.REDIRECT_URI;
+var STATE_KEY     = 'spotify_auth_state';
+
+var scopes = ['user-read-currently-playing', 'user-modify-playback-state'];
+
+var spotifyApi = new Spotify ({
+  clientId: CLIENT_ID,
+  clientSecret: CLIENT_SECRET,
+  redirectUri: REDIRECT_URI
+});
+
+var generateRandomString = N => (Math.random().toString(36)+Array(N).join('0')).slice(2, N+2);
 
 var votes = [];
 
+var app = express();
 app.use(express.static('src'))
+  .use(cookieParser())
   .set('views', 'views')
   .set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
   res.render('index');
+});
+
+app.get('/login', function (req, res) {
+  var state = generateRandomString(16);
+  res.cookie(STATE_KEY, state);
+  res.redirect(spotifyApi.createAuthorizeURL(scopes, state));
+});
+
+app.get('/callback', function (req, res) {
+  const { code, state } = req.query;
+  const storedState = req.cookies ? req.cookies[STATE_KEY] : null;
+
+  if (state === null || state !== storedState) {
+     res.redirect('/#' +
+       querystring.stringify({
+         error: 'state_mismatch'
+       }));
+  } else {
+     res.clearCookie(STATE_KEY);
+     // Retrieve an access token and a refresh token
+     spotifyApi.authorizationCodeGrant(code).then(data => {
+       const { expires_in, access_token, refresh_token } = data.body;
+
+       // Set the access token on the API object to use it in later calls
+       spotifyApi.setAccessToken(access_token);
+       spotifyApi.setRefreshToken(refresh_token);
+
+       // use the access token to access the Spotify Web API
+       spotifyApi.getMe().then(({ body }) => {
+         console.log(body);
+       });
+
+       // we can also pass the token to the browser to make requests from there
+       res.redirect('/current/#' +
+         querystring.stringify({
+           access_token: access_token,
+           refresh_token: refresh_token
+         }));
+     }).catch(err => {
+       res.redirect('/#' +
+         querystring.stringify({
+           error: 'invalid_token'
+         }));
+     });
+   }
+});
+
+app.get('/current', function (req, res) {
+   spotifyApi.getUsersCurrentlyPlayingTrack().then(({ body }) => {
+     console.log(body);
+     res.render('current', { data : body});
+   });
+ });
+
+app.post('/play', function (req, res) {
+  spotifyApi.startUsersPlayback().then(({ body }) => {
+    console.log(body);
+    res.redirect('/current');
+  });
+});
+
+app.post('/pause', function (req, res) {
+  spotifyApi.pauseUsersPlayback().then(({ body }) => {
+    console.log(body);
+    res.redirect('/current');
+  });
+});
+
+app.post('/next', function (req, res) {
+  spotifyApi.nextUsersTrack().then(({ body }) => {
+    console.log(body);
+    res.redirect('/current');
+  });
+});
+
+app.post('/previous', function (req, res) {
+  spotifyApi.previousUsersTrack().then(({ body }) => {
+    console.log(body);
+    res.redirect('/current');
+  });
+});
+
+app.get('/refresh_token', function (req, res) {
+  const { refresh_token } = req.query;
+  if (refresh_token) {
+    spotifyApi.setRefreshToken(refresh_token);
+  }
+  spotifyApi.refreshAccessToken().then(({body}) =>  {
+    res.send({
+      'access_token': body.access_token
+    })
+  }).catch(err => {
+    console.log('Could not refresh access token', err);
+  });
 });
 
 app.get('/api/vote', function (req, res) {

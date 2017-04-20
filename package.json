@@ -4,7 +4,7 @@
   "description": "Code &amp; documentation for the Minor Class: Web Of Things 📡",
   "main": "app.js",
   "scripts": {
-    "start": "npm i && node app.js",
+    "start": "node app.js",
     "start-dev": "npm i && nodemon app.js",
     "test": "xo"
   },
@@ -20,10 +20,15 @@
   },
   "homepage": "https://github.com/dandevri/minor-wot#readme",
   "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "dotenv": "^4.0.0",
     "ejs": "^2.5.6",
     "express": "^4.15.2",
     "lodash": "^4.17.4",
-    "node-fetch": "^1.6.3"
+    "node-fetch": "^1.6.3",
+    "querystring": "^0.2.0",
+    "request": "^2.81.0",
+    "spotify-web-api-node": "^2.3.6"
   },
   "devDependencies": {
     "nodemon": "^1.11.0",
