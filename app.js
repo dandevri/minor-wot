@@ -63,14 +63,12 @@ function buttonFeedback(type, id) {
   }
 }
 
-app.get('/api/vote', function (req, res) {
+app.get('/api/volume', function (req, res) {
   console.log('Received volume ', req.query.direction, ' request');
   if (req.query.direction === 'up') {
     volume += 10;
-    console.log('New volume', volume);
   } else if (req.query.direction === 'down') {
     volume -= 10;
-    console.log('New volume', volume);
   } else {
     console.warn('Unknown query passed');
   }
@@ -81,8 +79,7 @@ app.get('/api/vote', function (req, res) {
     volume = 0;
   }
 
-  res.send('Volume will be set to ', volume);
-  return volume;
+  res.send('Volume will be set to ' + volume);
 });
 
 function removeSettings(id) {
