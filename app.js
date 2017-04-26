@@ -72,7 +72,7 @@ app.get('/api/vote', function (req, res) {
     volume -= 10;
     console.log('New volume', volume);
   } else {
-    console.warn('Unknown wuery passed');
+    console.warn('Unknown query passed');
   }
 
   if (volume > 100) {
