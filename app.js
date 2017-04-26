@@ -1,5 +1,6 @@
 var express = require('express');
 var includes = require('lodash/includes');
+var map = require('lodash/map');
 var fetch = require('node-fetch');
 
 var port = process.env.PORT || '3000';
@@ -21,8 +22,8 @@ app.get('/', function (req, res) {
 app.get('/api/vote', function (req, res) {
   console.log('Received vote from ', req.query.chip);
   if (!includes(votes, req.query.chip)) {
-    vote(req.query.chip);
     buttonFeedback('vote', req.query.chip);
+    vote(req.query.chip);
     res.send('vote registered on ' + req.query.chip);
     return;
   }
@@ -34,11 +35,11 @@ function vote(id) {
 
   if (votes.length >= 3) {
     console.log('sufficient votes, skipp current song');
-    clearVotes();
+    buttonFeedback('skip', id, votes);
   }
 }
 
-function buttonFeedback(type, id) {
+function buttonFeedback(type, id, all) {
   switch (type) {
     case 'waiting':
       console.log('send ' + id + ' waiting color');
@@ -55,8 +56,20 @@ function buttonFeedback(type, id) {
           console.log(err);
         });
       break;
-    case 'skipp':
-      console.log('send ' + id + ' skipp color');
+    case 'skip':
+      console.log('send skip color to all subscribed buttons');
+      map(all, function (one) {
+        fetch('http://oege.ie.hva.nl/~palr001/icu/api.php?t=sdc&d=XXXX&td=' + one + '&c=7CB342')
+        .then(fetch('http://oege.ie.hva.nl/~palr001/icu/api.php?t=sqi&d=XXXX')
+          .catch(function (err) {
+            console.log(err);
+          }))
+        .then(removeSettings(one))
+        .catch(function (err) {
+          console.log(err);
+        });
+      });
+      clearVotes();
       break;
     default:
       break;
