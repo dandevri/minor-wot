@@ -1,19 +1,19 @@
-var Spotify       = require('spotify-web-api-node');
-var express       = require('express');
-var querystring   = require('querystring');
-var cookieParser  = require('cookie-parser');
-var request       = require('request');
-var dotenv        = require('dotenv').config();
-var includes      = require('lodash/includes');
-var fetch         = require('node-fetch');
+var Spotify = require('spotify-web-api-node');
+var express = require('express');
+var querystring = require('querystring');
+var cookieParser = require('cookie-parser');
+var request = require('request');
+var dotenv = require('dotenv').config();
+var includes = require('lodash/includes');
+var fetch = require('node-fetch');
 
-var port          = process.env.PORT || '3000';
-var host          = process.env.HOST || '0.0.0.0';
+var port = process.env.PORT || '3000';
+var host = process.env.HOST || '0.0.0.0';
 
-var CLIENT_ID     = process.env.CLIENT_ID;
+var CLIENT_ID = process.env.CLIENT_ID;
 var CLIENT_SECRET = process.env.CLIENT_SECRET;
-var REDIRECT_URI  = process.env.REDIRECT_URI;
-var STATE_KEY     = 'spotify_auth_state';
+var REDIRECT_URI = process.env.REDIRECT_URI;
+var STATE_KEY = 'spotify_auth_state';
 
 var scopes = ['user-read-currently-playing', 'user-modify-playback-state'];
 
