@@ -8,6 +8,7 @@ var host = process.env.HOST || '0.0.0.0';
 var app = express();
 
 var votes = [];
+var volume = 50;
 
 app.use(express.static('src'))
   .set('views', 'views')
@@ -61,6 +62,28 @@ function buttonFeedback(type, id) {
       break;
   }
 }
+
+app.get('/api/vote', function (req, res) {
+  console.log('Received volume ', req.query.direction, ' request');
+  if (req.query.direction === 'up') {
+    volume += 10;
+    console.log('New volume', volume);
+  } else if (req.query.direction === 'down') {
+    volume -= 10;
+    console.log('New volume', volume);
+  } else {
+    console.warn('Unknown wuery passed');
+  }
+
+  if (volume > 100) {
+    volume = 100;
+  } else if (volume < 0) {
+    volume = 0;
+  }
+
+  res.send('Volume will be set to ', volume);
+  return volume;
+});
 
 function removeSettings(id) {
   setTimeout(
