@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include partials/meta %>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+  </head>
+  <body>
+  <main>
+    <h1> Spoofy Skip Station </h1>
+    <dl>
+      <div class="playing">
+        <dt>Currently Playing:</dt>
+        <dd><%= data.item.artists[0].name %> - <%= data.item.name %></dd>
+      </div>
+      <hr>
+      <div class="voting">
+        <dt>Users voted:</dt>
+        <dd>👍 1</dd>
+      </div>
+    </dl>
+
+    <div class="controls">
+      <form method="post">
+        <button formaction="/previous">←</button>
+        <button formaction="/play">▶</button>
+        <button formaction="/pause">| |</button>
+        <button formaction="/next">→</button>
+      </form>
+    </div>
+
+  </main>
+  </body>
+</html>
