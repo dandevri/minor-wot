@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var request = require('request');
 var dotenv = require('dotenv').config();
 var includes = require('lodash/includes');
+var map = require('lodash/map');
 var fetch = require('node-fetch');
 
 var port = process.env.PORT || '3000';
@@ -26,6 +27,7 @@ var spotifyApi = new Spotify ({
 var generateRandomString = N => (Math.random().toString(36)+Array(N).join('0')).slice(2, N+2);
 
 var votes = [];
+var volume = 50;
 
 var app = express();
 app.use(express.static('src'))
@@ -134,8 +136,8 @@ app.get('/refresh_token', function (req, res) {
 app.get('/api/vote', function (req, res) {
   console.log('Received vote from ', req.query.chip);
   if (!includes(votes, req.query.chip)) {
-    vote(req.query.chip);
     buttonFeedback('vote', req.query.chip);
+    vote(req.query.chip);
     res.send('vote registered on ' + req.query.chip);
     return;
   }
@@ -147,11 +149,11 @@ function vote(id) {
 
   if (votes.length >= 3) {
     console.log('sufficient votes, skipp current song');
-    clearVotes();
+    buttonFeedback('skip', id, votes);
   }
 }
 
-function buttonFeedback(type, id) {
+function buttonFeedback(type, id, all) {
   switch (type) {
     case 'waiting':
       console.log('send ' + id + ' waiting color');
@@ -168,13 +170,44 @@ function buttonFeedback(type, id) {
           console.log(err);
         });
       break;
-    case 'skipp':
-      console.log('send ' + id + ' skipp color');
+    case 'skip':
+      console.log('send skip color to all subscribed buttons');
+      map(all, function (one) {
+        fetch('http://oege.ie.hva.nl/~palr001/icu/api.php?t=sdc&d=XXXX&td=' + one + '&c=7CB342')
+        .then(fetch('http://oege.ie.hva.nl/~palr001/icu/api.php?t=sqi&d=XXXX')
+          .catch(function (err) {
+            console.log(err);
+          }))
+        .then(removeSettings(one))
+        .catch(function (err) {
+          console.log(err);
+        });
+      });
+      clearVotes();
       break;
     default:
       break;
   }
 }
+
+app.get('/api/volume', function (req, res) {
+  console.log('Received volume ', req.query.direction, ' request');
+  if (req.query.direction === 'up') {
+    volume += 10;
+  } else if (req.query.direction === 'down') {
+    volume -= 10;
+  } else {
+    console.warn('Unknown query passed');
+  }
+
+  if (volume > 100) {
+    volume = 100;
+  } else if (volume < 0) {
+    volume = 0;
+  }
+
+  res.send('Volume will be set to ' + volume);
+});
 
 function removeSettings(id) {
   setTimeout(
