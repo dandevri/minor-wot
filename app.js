@@ -51,8 +51,8 @@ app.use(express.static('src'))
    .post('/pause', pauseUsersPlayback)
    .post('/next', nextUsersTrack)
    .post('/previous', previousUsersTrack)
-   .post('/volume', setCurrentUsersVolume)
    .get('/refresh-token', refreshToken)
+   .get('/api/volume', changeVolume)
    .get('/api/vote', apiVote);
 
 // Get home view
@@ -133,26 +133,23 @@ function previousUsersTrack (req, res) {
   });
 }
 
-// Set the volume for the user’s current playback device
-function setCurrentUsersVolume (req, res) {
-  spotifyApi.setCurrentUsersVolume(100).then(({ body }) => {
-    console.log('Received volume ', req.query.direction, ' request');
-    if (req.query.direction === 'up') {
-      volume += 10;
-    } else if (req.query.direction === 'down') {
-      volume -= 10;
-    } else {
-      console.warn('Unknown query passed');
-    }
+function changeVolume (req, res) {
+  console.log('Received volume ', req.query.direction, ' request');
+  if (req.query.direction === 'up') {
+    volume += 10;
+  } else if (req.query.direction === 'down') {
+    volume -= 10;
+  } else {
+    console.warn('Unknown query passed');
+  }
 
-    if (volume > 100) {
-      volume = 100;
-    } else if (volume < 0) {
-      volume = 0;
-    }
-    res.redirect('/current');
-    // res.send('Volume will be set to ' + volume);
-  });
+  if (volume > 100) {
+    volume = 100;
+  } else if (volume < 0) {
+    volume = 0;
+  }
+  setCurrentUsersVolume();
+  res.send('Volume will be set to ' + volume);
 }
 
 function removeSettings(id) {
@@ -176,6 +173,14 @@ function refreshToken (req, res) {
     })
   }).catch(err => {
     console.log('Could not refresh access token', err);
+  });
+}
+
+// Set the volume for the user’s current playback device
+function setCurrentUsersVolume (volume) {
+  spotifyApi.setCurrentUsersVolume(volume).then(({ body }) => {
+  }, (err) => {
+    console.log(err);
   });
 }
 
