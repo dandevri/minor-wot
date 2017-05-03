@@ -4,7 +4,7 @@
   "description": "Code &amp; documentation for the Minor Class: Web Of Things 📡",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "npm i && node app.js",
     "start-dev": "npm i && nodemon app.js",
     "test": "xo"
   },
