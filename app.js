@@ -49,8 +49,6 @@ app.use(express.static('src'))
    .get('/current', getUsersCurrentlyPlayingTrack)
    .post('/play', startUsersPlayback)
    .post('/pause', pauseUsersPlayback)
-   .post('/next', nextUsersTrack)
-   .post('/previous', previousUsersTrack)
    .get('/refresh-token', refreshToken)
    .get('/api/volume', changeVolume)
    .get('/api/vote', apiVote);
@@ -115,20 +113,6 @@ function startUsersPlayback (req, res) {
 // Pause playback on the user's account
 function pauseUsersPlayback (req, res) {
   spotifyApi.pauseUsersPlayback().then(({ body }) => {
-    res.redirect('/current');
-  });
-}
-
-// Skips to previous track in user's queue
-function nextUsersTrack (req, res) {
-  spotifyApi.nextUsersTrack().then(({ body }) => {
-    res.redirect('/current');
-  });
-}
-
-// Skip to user's previous track in queue
-function previousUsersTrack (req, res) {
-  spotifyApi.previousUsersTrack().then(({ body }) => {
     res.redirect('/current');
   });
 }
