@@ -49,6 +49,7 @@ app.use(express.static('src'))
    .get('/current', getUsersCurrentlyPlayingTrack)
    .post('/play', startUsersPlayback)
    .post('/pause', pauseUsersPlayback)
+   .post('/next', nextUsersTrack)
    .get('/refresh-token', refreshToken)
    .get('/api/volume', changeVolume)
    .get('/api/vote', apiVote);
@@ -68,7 +69,8 @@ function login (req, res) {
 }
 
 function callback (req, res) {
-  const { code, state } = req.query;
+  var code = req.query.code;
+  var state = req.query.state;
   var storedState = req.cookies ? req.cookies[STATE_KEY] : null;
 
 // First do state validation
@@ -82,8 +84,10 @@ function callback (req, res) {
      // Clear the cookie that was set
      res.clearCookie(STATE_KEY);
      // Retrieve an access token and a refresh token
-     spotifyApi.authorizationCodeGrant(code).then(data => {
-       const { expires_in, access_token, refresh_token } = data.body;
+     spotifyApi.authorizationCodeGrant(code).then(function (data) {
+       var expires_in = data.body.expires_in;
+       var access_token = data.body.access_token;
+       var refresh_token = data.body.refresh_token;
 
        // Set the access token on the API object to use it in later calls
        spotifyApi.setAccessToken(access_token);
@@ -97,23 +101,50 @@ function callback (req, res) {
 
 // Get the object currently being played on the user's Spotify account
 function getUsersCurrentlyPlayingTrack (req, res) {
-   spotifyApi.getUsersCurrentlyPlayingTrack().then(({ body }) => {
+   spotifyApi.getUsersCurrentlyPlayingTrack().then(function (response) {
+     var body = response.body;
      // Render the data to the current view
-     res.render('current', { data : body});
+     res.render('current', { data : body, votes: votes.length });
+   }).catch(function(err) {
+     console.log(err);
    });
  }
 
 // Start a new context or resume current playback on the user's active device
 function startUsersPlayback (req, res) {
-  spotifyApi.startUsersPlayback().then(({ body }) => {
+  spotifyApi.startUsersPlayback().then(function (response) {
+    var body = response.body;
     res.redirect('/current');
+  }).catch(function(err) {
+    console.log(err);
   });
 }
 
 // Pause playback on the user's account
 function pauseUsersPlayback (req, res) {
-  spotifyApi.pauseUsersPlayback().then(({ body }) => {
+  spotifyApi.pauseUsersPlayback().then(function (response) {
+    var body = response.body;
     res.redirect('/current');
+  }).catch(function(err) {
+    console.log(err);
+  });
+}
+
+// Skips to previous track in user's queue
+function nextUsersTrack () {
+  spotifyApi.nextUsersTrack().then(function (response) {
+    var body = response.body;
+  }).catch(function(err) {
+    console.log(err);
+  });
+}
+
+// Set the volume for the user’s current playback device
+function setCurrentUsersVolume (volume) {
+  spotifyApi.setCurrentUsersVolume(volume).then(function (response) {
+    var body = response.body;
+  }).catch(function(err) {
+    console.log(err);
   });
 }
 
@@ -147,24 +178,17 @@ function removeSettings(id) {
 
 // Request access token from refresh token
 function refreshToken (req, res) {
-  const { refresh_token } = req.query;
+  var refresh_token = req.query.refresh_token;
   if (refresh_token) {
     spotifyApi.setRefreshToken(refresh_token);
   }
-  spotifyApi.refreshAccessToken().then(({body}) =>  {
+  spotifyApi.refreshAccessToken().then(function (response)  {
+    var body = response.body;
     res.send({
       'access_token': body.access_token
-    })
-  }).catch(err => {
+    });
+  }).catch(function(err) {
     console.log('Could not refresh access token', err);
-  });
-}
-
-// Set the volume for the user’s current playback device
-function setCurrentUsersVolume (volume) {
-  spotifyApi.setCurrentUsersVolume(volume).then(({ body }) => {
-  }, (err) => {
-    console.log(err);
   });
 }
 
@@ -182,9 +206,10 @@ function apiVote (req, res) {
 function vote(id) {
   votes.push(id);
 
-  if (votes.length >= 3) {
-    console.log('sufficient votes, skipp current song');
+  if (votes.length >= 1) {
+    console.log('sufficient votes, skip current song');
     buttonFeedback('skip', id, votes);
+    nextUsersTrack();
   }
 }
 
