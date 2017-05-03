@@ -35,7 +35,7 @@ var generateRandomString = function(N) {
 
 // Set default volume
 var votes = [];
-var volume = 50;
+var volume = 40;
 
 // Set express app and declare all functions
 var app = express();
@@ -136,9 +136,9 @@ function previousUsersTrack (req, res) {
 function changeVolume (req, res) {
   console.log('Received volume ', req.query.direction, ' request');
   if (req.query.direction === 'up') {
-    volume += 10;
+    volume += 20;
   } else if (req.query.direction === 'down') {
-    volume -= 10;
+    volume -= 20;
   } else {
     console.warn('Unknown query passed');
   }
@@ -148,7 +148,7 @@ function changeVolume (req, res) {
   } else if (volume < 0) {
     volume = 0;
   }
-  setCurrentUsersVolume();
+  setCurrentUsersVolume(volume);
   res.send('Volume will be set to ' + volume);
 }
 
